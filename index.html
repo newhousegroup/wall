@@ -339,7 +339,7 @@ const displayTitle = isAdminMsg
   }
   ${escape(displayTitle)}
 </b>
-        ${t.locked ? ` <span class="locked">🔒</span>` : ""}
+        ${t.locked && (!isAdminMsg) ? ` <span class="locked">🔒</span>` : ""}
         <div class="preview">${escape(t.body || "")}</div>
 
         <div class="metaRow">
@@ -379,7 +379,7 @@ const displayTitle = isAdminMsg
          Admin
        </span>`
     : ""
-  }${escape(displayTitle)} ${t.locked ? "🔒" : ""}</h3>
+  }${escape(displayTitle)} ${t.locked && (!isAdminMsg) ? "🔒" : ""}</h3>
       <div class="metaRow" style="margin-top:0;margin-bottom:10px;">
         <span class="material-symbols-rounded">comment</span>
         <span>${count}</span>
