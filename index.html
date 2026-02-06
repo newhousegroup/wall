@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="A place to post things.">
 <title>Newhouse Forum</title>
 
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:wght@400" />
@@ -60,7 +59,7 @@ header .right{display:flex;gap:10px;align-items:center;}
   background:var(--yellow);
   cursor:pointer;
   color:#111;
-  font-weight:700;
+  font-weight:800;
 }
 
 .iconBtn{
@@ -69,21 +68,20 @@ header .right{display:flex;gap:10px;align-items:center;}
   align-items:center;
   justify-content:center;
 }
-.iconBtn .material-symbols-rounded{font-size:22px;}
+.iconBtn .material-symbols-rounded{font-size:22px; line-height:1;}
 
 .btnAdd{
   padding:0 14px;
   display:flex;
   align-items:center;
-  justify-content:center;
   gap:8px;
 }
 .btnAdd .addIcon{display:none;}
 
 @media(max-width:500px){
-  .btnAdd{width:42px;padding:0;}
+  .btnAdd{width:42px;padding:0; justify-content:center;}
   .btnAdd .addText{display:none;}
-  .btnAdd .addIcon{display:flex;font-size:22px;}
+  .btnAdd .addIcon{display:flex;font-size:22px; line-height:1;}
 }
 
 /* CONTENT */
@@ -113,9 +111,25 @@ header .right{display:flex;gap:10px;align-items:center;}
   overflow:hidden;
 }
 
+.metaRow{
+  margin-top:8px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  color:var(--muted);
+  font-size:13px;
+}
+
+.metaRow .material-symbols-rounded{
+  font-size:18px;
+  line-height:1;
+  vertical-align:middle;
+  opacity:.95;
+}
+
 .locked{
   color:#ff4d4d;
-  font-weight:700;
+  font-weight:800;
 }
 
 /* EMPTY */
@@ -162,28 +176,25 @@ input,textarea{
 }
 
 .btnYellow{background:var(--yellow);color:#111;}
-  .btnOutline{background:var(--blue);border:2px solid var(--yellow);color:#fff;}
 .btnRed{background:#ff4d4d;color:white;}
 .btnGhost{
   background:transparent;
   color:var(--text);
   border:1px solid rgba(255,255,255,.2);
 }
-
-button{padding:8px;border-radius:8px;}
 </style>
 </head>
 
 <body>
 
 <header>
-  <span style="font-size:28px;color:white;">Newhouse Forum</span>
+  <span style="font-size:28px;color:white">Newhouse Forum</span>
   <div class="right">
     <button class="btnAdd" onclick="openNewThread()">
       <span class="addText">+ New Thread</span>
-      <span class="material-symbols-rounded addIcon iconBtn">add</span>
+      <span class="material-symbols-rounded addIcon">add</span>
     </button>
-    <button class="iconBtn" id="adminBtn" onclick="enterAdmin()" disabled>
+    <button class="iconBtn" id="adminBtn" onclick="enterAdmin()" disabled aria-label="Admin Key">
       <span class="material-symbols-rounded">key</span>
     </button>
   </div>
@@ -212,111 +223,134 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
 import {
   getFirestore, collection, doc, addDoc, getDoc, getDocs,
-  onSnapshot, updateDoc, deleteDoc, serverTimestamp
+  onSnapshot, updateDoc, deleteDoc, serverTimestamp, increment
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 /* FIREBASE */
-const firebaseConfig={
-  apiKey:"AIzaSyAplfN5_ye00-NBeTdV9_N1uJ0w2BDV-X0",
-  authDomain:"newhouse-forum.firebaseapp.com",
-  projectId:"newhouse-forum",
-  storageBucket:"newhouse-forum.firebasestorage.app",
-  messagingSenderId:"1000240641292",
-  appId:"1:1000240641292:web:2e1459957606ca35fc0529",
-  measurementId:"G-05MYHQZMBG"
+const firebaseConfig = {
+  apiKey: "AIzaSyAplfN5_ye00-NBeTdV9_N1uJ0w2BDV-X0",
+  authDomain: "newhouse-forum.firebaseapp.com",
+  projectId: "newhouse-forum",
+  storageBucket: "newhouse-forum.firebasestorage.app",
+  messagingSenderId: "1000240641292",
+  appId: "1:1000240641292:web:2e1459957606ca35fc0529",
+  measurementId: "G-05MYHQZMBG"
 };
 
-const app=initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
 getAnalytics(app);
-const db=getFirestore(app);
+const db = getFirestore(app);
 
 /* STATE */
-let threads=[];
-let currentThread=null;
-let isAdmin=false;
-let ADMIN_KEY=null;
-let adminLoaded=false;
+let threads = [];
+let currentThread = null;
+let isAdmin = false;
+let ADMIN_KEY = null;
+let adminLoaded = false;
 
 /* LOAD ADMIN KEY */
 async function loadAdminKey(){
   try{
-    const snap=await getDoc(doc(db,"config","forum"));
-    if(snap.exists()) ADMIN_KEY=snap.data().adminKey;
+    const snap = await getDoc(doc(db,"config","forum"));
+    if(snap.exists()) ADMIN_KEY = snap.data().adminKey;
+  }catch(e){
+    console.error("Admin config load failed:", e);
   }finally{
-    adminLoaded=true;
-    adminBtn.disabled=false;
+    adminLoaded = true;
+    adminBtn.disabled = false;
   }
 }
 loadAdminKey();
 
 /* ADMIN */
-window.enterAdmin=()=>{
+window.enterAdmin = () => {
   if(!adminLoaded) return alert("Loading admin config…");
-  if(!ADMIN_KEY) return alert("Admin config missing");
+  if(!ADMIN_KEY) return alert("Admin config missing (config/forum.adminKey)");
 
-  const k=prompt("Admin key:");
-  if(k===ADMIN_KEY){
-    isAdmin=true;
+  const k = prompt("Admin key:");
+  if(k === ADMIN_KEY){
+    isAdmin = true;
     alert("Admin mode enabled");
-    currentThread?openThread(currentThread):renderThreads();
+    currentThread ? openThread(currentThread) : renderThreads();
   }else{
     alert("Wrong key");
   }
 };
 
-/* THREAD LIST */
-onSnapshot(collection(db,"threads"),snap=>{
-  threads=[];
-  snap.forEach(d=>threads.push({id:d.id,...d.data()}));
+/* THREAD LIST LIVE */
+onSnapshot(collection(db,"threads"), snap=>{
+  threads = [];
+  snap.forEach(d=>threads.push({id:d.id, ...d.data()}));
   renderThreads();
 });
 
 function renderThreads(){
-  currentThread=null;
-  threadView.style.display="none";
-  threadList.style.display="block";
-  threadList.innerHTML="";
+  currentThread = null;
+  threadView.style.display = "none";
+  threadList.style.display = "block";
+  threadList.innerHTML = "";
 
   if(!threads.length){
-    empty.style.display="block";
+    empty.style.display = "block";
     return;
   }
-  empty.style.display="none";
+  empty.style.display = "none";
 
   threads
-    .sort((a,b)=>b.createdAt?.seconds-a.createdAt?.seconds)
+    .sort((a,b)=> (b.createdAt?.seconds||0) - (a.createdAt?.seconds||0))
     .forEach(t=>{
-      const div=document.createElement("div");
-      div.className="card clickable";
-      div.innerHTML=`
+      const div = document.createElement("div");
+      div.className = "card clickable";
+
+      const count = Number.isFinite(t.commentCount) ? t.commentCount : 0;
+      const dateStr = t.createdAt?.toDate ? t.createdAt.toDate().toLocaleString() : "";
+
+      div.innerHTML = `
         <b>${escape(t.title)}</b>
-        ${t.locked?` <span class="locked">🔒</span>`:""}
-        <div class="preview">${escape(t.body)}</div>
-        <small>${t.createdAt?.toDate().toLocaleString()||""}</small>
+        ${t.locked ? ` <span class="locked">🔒</span>` : ""}
+        <div class="preview">${escape(t.body || "")}</div>
+
+        <div class="metaRow">
+          <span class="material-symbols-rounded">comment</span>
+          <span>${count}</span>
+          <span>•</span>
+          <span>${escape(dateStr)}</span>
+        </div>
       `;
-      div.onclick=()=>openThread(t);
+
+      div.onclick = ()=>openThread(t);
       threadList.appendChild(div);
     });
 }
 
 /* THREAD VIEW */
 async function openThread(t){
-  currentThread=t;
-  threadList.style.display="none";
-  threadView.style.display="block";
+  currentThread = t;
+  threadList.style.display = "none";
+  threadView.style.display = "block";
 
-  threadView.innerHTML=`
+  const count = Number.isFinite(t.commentCount) ? t.commentCount : 0;
+  const dateStr = t.createdAt?.toDate ? t.createdAt.toDate().toLocaleString() : "";
+
+  threadView.innerHTML = `
     <button class="btnGhost" onclick="goBack()">← Back</button>
 
     <div class="card">
-      <h3>${escape(t.title)} ${t.locked?"🔒":""}</h3>
-      <p>${escape(t.body)}</p>
+      <h3 style="margin:0 0 8px 0;">${escape(t.title)} ${t.locked ? "🔒" : ""}</h3>
+      <div class="metaRow" style="margin-top:0;margin-bottom:10px;">
+        <span class="material-symbols-rounded">comment</span>
+        <span>${count}</span>
+        <span>•</span>
+        <span>${escape(dateStr)}</span>
+      </div>
+      <p style="margin:0;">${escape(t.body || "")}</p>
 
-      ${isAdmin?`
+      ${isAdmin ? `
         <div class="modalActions">
           <button class="btnGhost" onclick="toggleLock()">Toggle Lock</button>
           <button class="btnRed" onclick="deleteThread()">Delete Thread</button>
-        </div>`:""}
+        </div>` : ""
+      }
     </div>
 
     <h4>Comments</h4>
@@ -330,64 +364,76 @@ async function openThread(t){
       `}
   `;
 
-  const snap=await getDocs(collection(db,"threads",t.id,"comments"));
-  const box=document.getElementById("comments");
+  const snap = await getDocs(collection(db,"threads",t.id,"comments"));
+  const box = document.getElementById("comments");
 
   snap.forEach(d=>{
-    const c=d.data();
-    const div=document.createElement("div");
-    div.className="card";
-    div.innerHTML=`
-      ${escape(c.body)}
-      ${isAdmin?`<button class="btnRed" onclick="deleteComment('${d.id}')">Delete</button>`:""}
+    const c = d.data();
+    const div = document.createElement("div");
+    div.className = "card";
+    div.innerHTML = `
+      ${escape(c.body || "")}
+      ${isAdmin ? `<div class="modalActions"><button class="btnRed" onclick="deleteComment('${d.id}')">Delete</button></div>` : ""}
     `;
     box.appendChild(div);
   });
 }
 
 /* BACK */
-window.goBack=()=>renderThreads();
+window.goBack = () => renderThreads();
 
-/* ACTIONS */
-window.openNewThread=()=>threadModal.classList.add("show");
-window.closeThreadModal=()=>threadModal.classList.remove("show");
+/* MODAL */
+window.openNewThread = ()=>threadModal.classList.add("show");
+window.closeThreadModal = ()=>threadModal.classList.remove("show");
 
-window.postThread=async()=>{
-  const title=threadTitle.value.trim();
-  const body=threadBody.value.trim();
-  if(!title||!body) return alert("Fill everything");
+/* CREATE THREAD */
+window.postThread = async ()=>{
+  const title = threadTitle.value.trim();
+  const body  = threadBody.value.trim();
+  if(!title || !body) return alert("Fill everything");
 
   await addDoc(collection(db,"threads"),{
-    title,body,
+    title,
+    body,
     locked:false,
-    createdAt:serverTimestamp()
+    commentCount: 0,
+    createdAt: serverTimestamp()
   });
 
-  threadTitle.value="";
-  threadBody.value="";
+  threadTitle.value = "";
+  threadBody.value = "";
   closeThreadModal();
 };
 
-window.postComment=async()=>{
-  const text=commentInput.value.trim();
+/* ADD COMMENT + INCREMENT COUNT */
+window.postComment = async ()=>{
+  const text = commentInput.value.trim();
   if(!text) return;
 
-  await addDoc(collection(db,"threads",currentThread.id,"comments"),{
-    body:text,
-    createdAt:serverTimestamp()
-  });
+  await addDoc(
+    collection(db,"threads",currentThread.id,"comments"),
+    { body:text, createdAt: serverTimestamp() }
+  );
 
-  openThread(currentThread);
+  await updateDoc(
+    doc(db,"threads",currentThread.id),
+    { commentCount: increment(1) }
+  );
+
+  // Refresh view
+  openThread({ ...currentThread, commentCount:(currentThread.commentCount||0)+1 });
 };
 
-window.toggleLock=async()=>{
+/* ADMIN: LOCK/UNLOCK */
+window.toggleLock = async ()=>{
   if(!isAdmin) return;
   await updateDoc(doc(db,"threads",currentThread.id),{
-    locked:!currentThread.locked
+    locked: !currentThread.locked
   });
 };
 
-window.deleteThread=async()=>{
+/* ADMIN: DELETE THREAD */
+window.deleteThread = async ()=>{
   if(!isAdmin) return;
   if(confirm("Delete thread?")){
     await deleteDoc(doc(db,"threads",currentThread.id));
@@ -395,18 +441,28 @@ window.deleteThread=async()=>{
   }
 };
 
-window.deleteComment=async(id)=>{
+/* ADMIN: DELETE COMMENT + DECREMENT COUNT */
+window.deleteComment = async (commentId)=>{
   if(!isAdmin) return;
-  await deleteDoc(doc(db,"threads",currentThread.id,"comments",id));
-  openThread(currentThread);
+
+  await deleteDoc(doc(db,"threads",currentThread.id,"comments",commentId));
+
+  await updateDoc(
+    doc(db,"threads",currentThread.id),
+    { commentCount: increment(-1) }
+  );
+
+  // Refresh view (safe)
+  openThread({ ...currentThread, commentCount: Math.max(0,(currentThread.commentCount||0)-1) });
 };
 
 /* UTILS */
 function escape(str){
-  return str.replace(/[&<>"']/g,m=>({
+  return String(str).replace(/[&<>"']/g,m=>({
     "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"
   }[m]));
 }
 </script>
+
 </body>
 </html>
