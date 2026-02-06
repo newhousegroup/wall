@@ -184,6 +184,19 @@ input,textarea{
 }
 
   button{padding:8px;border-radius:8px;}
+
+.adminBadge{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  padding:2px 8px;
+  border-radius:999px;
+  background:var(--blue);
+  color:white;
+  font-size:12px;
+  font-weight:700;
+  margin-right:6px;
+}
 </style>
 </head>
 
@@ -242,6 +255,8 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 getAnalytics(app);
 const db = getFirestore(app);
+
+  const ADMIN_PREFIX = "{notanadmincode}";
 
 /* STATE */
 let threads = [];
@@ -307,8 +322,23 @@ function renderThreads(){
       const count = Number.isFinite(t.commentCount) ? t.commentCount : 0;
       const dateStr = t.createdAt?.toDate ? t.createdAt.toDate().toLocaleString() : "";
 
+      const isAdminMsg = t.title && t.title.startsWith(ADMIN_PREFIX);
+
+const displayTitle = isAdminMsg
+  ? t.title.replace(ADMIN_PREFIX, "").trim()
+  : t.title;
+
       div.innerHTML = `
-        <b>${escape(t.title)}</b>
+<b>
+  ${isAdminMsg
+    ? `<span class="adminBadge">
+         <span class="material-symbols-rounded" style="font-size:14px;line-height:1;">verified</span>
+         Admin
+       </span>`
+    : ""
+  }
+  ${escape(displayTitle)}
+</b>
         ${t.locked ? ` <span class="locked">🔒</span>` : ""}
         <div class="preview">${escape(t.body || "")}</div>
 
@@ -334,11 +364,22 @@ async function openThread(t){
   const count = Number.isFinite(t.commentCount) ? t.commentCount : 0;
   const dateStr = t.createdAt?.toDate ? t.createdAt.toDate().toLocaleString() : "";
 
+const isAdminMsg = t.title && t.title.startsWith(ADMIN_PREFIX);
+const displayTitle = isAdminMsg
+  ? t.title.replace(ADMIN_PREFIX, "").trim()
+  : t.title;
+
   threadView.innerHTML = `
     <button class="btnGhost" onclick="goBack()">← Back</button>
 
     <div class="card">
-      <h3 style="margin:0 0 8px 0;">${escape(t.title)} ${t.locked ? "🔒" : ""}</h3>
+      <h3 style="margin:0 0 8px 0;">  ${isAdminMsg
+    ? `<span class="adminBadge">
+         <span class="material-symbols-rounded" style="font-size:14px;line-height:1;">verified</span>
+         Admin
+       </span>`
+    : ""
+  }${escape(displayTitle)} ${t.locked ? "🔒" : ""}</h3>
       <div class="metaRow" style="margin-top:0;margin-bottom:10px;">
         <span class="material-symbols-rounded">comment</span>
         <span>${count}</span>
