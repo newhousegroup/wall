@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Newhouse Wall</title>
+  <meta name="description" content="A place to write things.">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:wght@400" />
+
+<style>
+*,*::before,*::after{box-sizing:border-box;}
+
+:root{
+  --blue:#0468fe;
+  --yellow:#FFD84D;
+  --bg:#0b0f1a;
+  --panel:#141a2b;
+  --panel2:#11182a;
+  --text:#fff;
+  --muted:rgba(255,255,255,.6);
+  --field:#0f1526;
+  --overlay:rgba(0,0,0,.6);
+}
+
+@media(prefers-color-scheme:light){
+  :root{
+    --bg:#f6f7fb;
+    --panel:#fff;
+    --panel2:#fff;
+    --text:#0b0f1a;
+    --muted:rgba(0,0,0,.55);
+    --field:#f1f3f7;
+    --overlay:rgba(0,0,0,.35);
+  }
+}
+
+body{
+  margin:0;
+  font-family:system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+
+/* HEADER */
+header{
+  background:var(--blue);
+  padding:12px 16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-weight:700;
+}
+header .right{display:flex;gap:10px;align-items:center;}
+
+.iconBtn,.btnAdd{
+  height:42px;
+  border:none;
+  border-radius:10px;
+  background:var(--yellow);
+  cursor:pointer;
+  color:#111;
+  font-weight:800;
+}
+
+.iconBtn{
+  width:42px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.iconBtn .material-symbols-rounded{font-size:22px; line-height:1;}
+
+.btnAdd{
+  padding:0 14px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.btnAdd .addIcon{display:none;}
+
+@media(max-width:500px){
+  .btnAdd{width:42px;padding:0; justify-content:center;}
+  .btnAdd .addText{display:none;}
+  .btnAdd .addIcon{display:flex;font-size:22px; line-height:1;}
+}
+
+/* CONTENT */
+#threadList,#threadView,.topText{
+  padding:0 20px 40px 20px ;
+  max-width:760px;
+  margin:auto;
+}
+
+.topText{
+  padding: 0 30px 10px 30px !important; 
+  font-size: 90%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.card{
+  background:var(--panel);
+  padding:14px 16px;
+  border-radius:14px;
+  margin-bottom:12px;
+}
+
+.card.clickable{cursor:pointer;}
+.card small{color:var(--muted);}
+
+.preview{
+  color:var(--muted);
+  font-size:14px;
+  margin-top:6px;
+  display:-webkit-box;
+  -webkit-line-clamp:3;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+}
+
+.metaRow{
+  margin-top:8px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  color:var(--muted);
+  font-size:13px;
+}
+
+.metaRow .material-symbols-rounded{
+  font-size:18px;
+  line-height:1;
+  vertical-align:middle;
+  opacity:.95;
+}
+
+.locked{
+  color:#ff4d4d;
+  font-weight:800;
+}
+
+/* EMPTY */
+#empty{
+  text-align:center;
+  margin-top:80px;
+  color:var(--muted);
+}
+
+/* MODALS */
+.modal{
+  position:fixed;
+  inset:0;
+  background:var(--overlay);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  padding:16px;
+}
+.modal.show{display:flex;}
+
+.modalContent{
+  background:var(--panel2);
+  padding:20px;
+  border-radius:14px;
+  width:100%;
+  max-width:420px;
+}
+
+input,textarea{
+  width:100%;
+  padding:10px;
+  margin:6px 0;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,.15);
+  background:var(--field);
+  color:var(--text);
+}
+
+.modalActions{
+  display:flex;
+  gap:10px;
+  margin-top:10px;
+}
+
+.btnYellow{background:var(--yellow);color:#111;}
+.btnRed{background:#ff4d4d;color:white;}
+.btnGhost{
+  background:transparent;
+  color:var(--text);
+  border:1px solid rgba(255,255,255,.2);
+}
+
+  button{padding:8px;border-radius:8px;}
+
+.adminBadge{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  padding:2px 8px;
+  border-radius:999px;
+  background:var(--blue);
+  color:white;
+  font-size:12px;
+  font-weight:700;
+  margin-right:6px;
+}
+
+a{color:var(--blue);text-decoration:underline;font-weight:700;}
+
+.content {padding:0 40px;}
+.content h1{font-size:40px;}
+</style>
+</head>
+
+<body>
+
+<header>
+  <span style="font-size:28px;color:white">Newhouse Wall</span>
+</header>
+
+<div class="content">
+<h1>about this site</h1>
+idk man you just post things i guess<br><br>
+<a href="">go back to wall</a>
+</div>
+</body>
+</html>
