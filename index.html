@@ -430,7 +430,7 @@ const isQMsg = t.title && t.title.startsWith(Q_PREFIX);
 const displayTitle = isAdminMsg
   ? t.title.replace(ADMIN_PREFIX, "").trim()
   : isQMsg
-? t.title.replace(Q_PREFIX,"").trim():"";
+? t.title.replace(Q_PREFIX,"").trim():t.title;
 
   threadView.innerHTML = `
     <button class="btnGhost" onclick="goBack()" style="margin-bottom: 10px;">← Back</button>
