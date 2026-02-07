@@ -343,7 +343,9 @@ window.enterAdmin = () => {
 onSnapshot(collection(db,"threads"), snap=>{
   threads = [];
   snap.forEach(d=>threads.push({id:d.id, ...d.data()}));
+if (!currentThread) {
   renderThreads();
+  }
 });
 
 function renderThreads(){
