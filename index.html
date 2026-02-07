@@ -206,6 +206,19 @@ input,textarea{
   margin-right:6px;
 }
 
+.qBadge{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  padding:2px 8px;
+  border-radius:999px;
+  background:var(--yellow);
+  color:black;
+  font-size:12px;
+  font-weight:700;
+  margin-right:6px;
+}
+
 a{color:var(--blue);text-decoration:underline;}
 </style>
 </head>
@@ -276,6 +289,7 @@ getAnalytics(app);
 const db = getFirestore(app);
 
   const ADMIN_PREFIX = "{notanadmincode}";
+    const Q_PREFIX = "{quality}";
 
 /* STATE */
 let threads = [];
@@ -361,10 +375,13 @@ threads
       const dateStr = t.createdAt?.toDate ? t.createdAt.toDate().toLocaleString() : "";
 
       const isAdminMsg = t.title && t.title.startsWith(ADMIN_PREFIX);
-
+      const isQMsg = t.title && t.title.startsWith(Q_PREFIX);
+      
 const displayTitle = isAdminMsg
   ? t.title.replace(ADMIN_PREFIX, "").trim()
-  : t.title;
+  : isQMsg
+      ? t.title.replace(Q_PREFIX, "").trim()
+      : t.title;
 
       div.innerHTML = `
 <b>
@@ -373,7 +390,11 @@ const displayTitle = isAdminMsg
          <span class="material-symbols-rounded" style="font-size:14px;line-height:1;">verified</span>
          Admin
        </span>`
-    : ""
+    : isQMsg
+? `<span class="qBadge">
+         <span class="material-symbols-rounded" style="font-size:14px;line-height:1;">trending_up</span>
+         Trending
+       </span>` : ""
   }
   ${escape(displayTitle)}
 </b>
@@ -403,20 +424,26 @@ async function openThread(t){
   const dateStr = t.createdAt?.toDate ? t.createdAt.toDate().toLocaleString() : "";
 
 const isAdminMsg = t.title && t.title.startsWith(ADMIN_PREFIX);
+const isQMsg = t.title && t.title.startsWith(Q_PREFIX);
 const displayTitle = isAdminMsg
   ? t.title.replace(ADMIN_PREFIX, "").trim()
-  : t.title;
+  : isQMsg
+? t.title.replace(Q_PREFIX,"").trim():"";
 
   threadView.innerHTML = `
     <button class="btnGhost" onclick="goBack()" style="margin-bottom: 10px;">← Back</button>
 
     <div class="card">
-      <h3 style="margin:0 0 8px 0;">  ${isAdminMsg
+      <h3 style="margin:0 0 8px 0;">    ${isAdminMsg
     ? `<span class="adminBadge">
          <span class="material-symbols-rounded" style="font-size:14px;line-height:1;">verified</span>
          Admin
        </span>`
-    : ""
+    : isQMsg
+? `<span class="qBadge">
+         <span class="material-symbols-rounded" style="font-size:14px;line-height:1;">trending_up</span>
+         Trending
+       </span>` : ""
   }${escape(displayTitle)} ${t.locked && (!isAdminMsg) ? "🔒" : ""}</h3>
       <div class="metaRow" style="margin-top:0;margin-bottom:10px;">
         <span class="material-symbols-rounded">comment</span>
