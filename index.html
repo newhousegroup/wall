@@ -441,11 +441,7 @@ const displayTitle = isAdminMsg
          <span class="material-symbols-rounded" style="font-size:14px;line-height:1;">verified</span>
          Admin
        </span>`
-    : isQMsg
-? `<span class="qBadge">
-         <span class="material-symbols-rounded" style="font-size:14px;line-height:1;">trending_up</span>
-         Trending
-       </span>` : ""
+    : ""
   }${escape(displayTitle)} ${t.locked && (!isAdminMsg) ? "🔒" : ""}</h3>
       <div class="metaRow" style="margin-top:0;margin-bottom:10px;">
         <span class="material-symbols-rounded">comment</span>
