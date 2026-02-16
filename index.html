@@ -219,6 +219,19 @@ input,textarea{
   margin-right:6px;
 }
 
+  .nBadge{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  padding:2px 8px;
+  border-radius:999px;
+  background:#bb0000;
+  color:black;
+  font-size:12px;
+  font-weight:700;
+  margin-right:6px;
+}
+
 a{color:var(--blue);text-decoration:underline;}
 </style>
 </head>
@@ -290,7 +303,8 @@ getAnalytics(app);
 const db = getFirestore(app);
 
   const ADMIN_PREFIX = "{notanadmincode}";
-    const Q_PREFIX = "{quality}";
+  const Q_PREFIX = "{quality}";
+  const N_PREFIX = "{markasnews}";
 
 /* STATE */
 let threads = [];
@@ -379,12 +393,16 @@ threads
 
       const isAdminMsg = t.title && t.title.startsWith(ADMIN_PREFIX);
       const isQMsg = t.title && t.title.startsWith(Q_PREFIX);
+      const isNMsg = t.title && t.title.startsWith(N_PREFIX);
+
       
 const displayTitle = isAdminMsg
   ? t.title.replace(ADMIN_PREFIX, "").trim()
   : isQMsg
       ? t.title.replace(Q_PREFIX, "").trim()
-      : t.title;
+      : isNMsg
+          ? t.title.replace(N_PREFIX, "").trim()
+          : t.title;
 
       div.innerHTML = `
 <b>
@@ -397,7 +415,11 @@ const displayTitle = isAdminMsg
 ? `<span class="qBadge">
          <span class="material-symbols-rounded" style="font-size:14px;line-height:1;">trending_up</span>
          Trending
-       </span>` : ""
+       </span>` : isNMsg 
+    ? `<span class="nBadge">
+         <span class="material-symbols-rounded" style="font-size:14px;line-height:1;">newsmode</span>
+         News
+       </span>` :""
   }
   ${escape(displayTitle)}
 </b>
@@ -428,10 +450,14 @@ async function openThread(t){
 
 const isAdminMsg = t.title && t.title.startsWith(ADMIN_PREFIX);
 const isQMsg = t.title && t.title.startsWith(Q_PREFIX);
+const isNMsg = t.title && t.title.startsWith(N_PREFIX);
 const displayTitle = isAdminMsg
   ? t.title.replace(ADMIN_PREFIX, "").trim()
   : isQMsg
-? t.title.replace(Q_PREFIX,"").trim():t.title;
+  ? t.title.replace(Q_PREFIX,"").trim()
+  : isNMsg
+  ? t.title.replace(N_PREFIX,"").trim()
+  : t.title;
 
   threadView.innerHTML = `
     <button class="btnGhost" onclick="goBack()" style="margin-bottom: 10px;">← Back</button>
@@ -441,6 +467,11 @@ const displayTitle = isAdminMsg
     ? `<span class="adminBadge">
          <span class="material-symbols-rounded" style="font-size:14px;line-height:1;">verified</span>
          Admin
+       </span>`
+    : isNMsg 
+    ? `<span class="nBadge">
+         <span class="material-symbols-rounded" style="font-size:14px;line-height:1;">newsmode</span>
+         News
        </span>`
     : ""
   }${escape(displayTitle)} ${t.locked && (!isAdminMsg) ? "🔒" : ""}</h3>
